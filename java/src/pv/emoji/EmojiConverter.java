@@ -2,6 +2,7 @@ package pv.emoji;
 
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 import org.jsoup.*;
 import org.jsoup.nodes.*;
@@ -20,7 +21,7 @@ public class EmojiConverter {
 		// search for update option
 		for (String s : args) {
 			if (s.equals("-u") || s.equals("-update")) {
-				System.out.println("updating data");
+				System.out.println("Updating data");
 				updateEmojiMap(new File("emojimap.data"));
 				break;
 			}
@@ -57,8 +58,7 @@ public class EmojiConverter {
 			try {
 				return (Map<String[], Integer[]>) obj;
 			} catch (ClassCastException cce) {
-				System.out.println("object input stream does not have a Map<String[], Character[]> instance");
-				return null;
+				throw cce;
 			}
 		} catch (Exception e) {
 			throw e;
@@ -67,10 +67,26 @@ public class EmojiConverter {
 
 	static void updateEmojiMap(File updatePath) throws Exception {
 		String baseURL = "https://emojipedia.org";
-		Document doc = Jsoup.connect(baseURL + "/emoji/").get();
+		File responseDataCache = new File("cache");
+		responseDataCache.deleteOnExit();
+		{
+			System.out.println("retrieving emoji data");
+			InputStream is = new URL(baseURL + "/emoji/").openStream();
+			FileOutputStream fos = new FileOutputStream(responseDataCache);
+			int data;
+			while ((data = is.read()) != -1) {
+				fos.write(data);
+				fos.flush();
+			}
+			fos.close();
+			is.close();
+		}
+		System.out.println("parsing grouped emoji data");
+		Document doc = Jsoup.parse(responseDataCache, null);
 		Element emojiList = doc.getElementsByClass("emoji-list").get(0);
 		Elements rows = emojiList.getElementsByTag("tr");
 		int size = rows.size();
+		System.out.print("parsing individual emoji data [");
 		for (int index = 0; index < size; index++) {
 			try {
 				Element row = rows.get(index);
@@ -86,7 +102,18 @@ public class EmojiConverter {
 				}
 
 				try {
-					Document emojiDoc = Jsoup.connect(baseURL + emojiURL).get();
+					{
+						InputStream is = new URL(baseURL + emojiURL).openStream();
+						FileOutputStream fos = new FileOutputStream(responseDataCache);
+						int d;
+						while ((d = is.read()) != -1) {
+							fos.write(d);
+							fos.flush();
+						}
+						fos.close();
+						is.close();
+					}
+					Document emojiDoc = Jsoup.parse(responseDataCache, null);
 					Elements sces = emojiDoc.getElementsByClass("shortcodes");
 					if (sces == null || sces.size() == 0) {
 						continue;
@@ -106,8 +133,11 @@ public class EmojiConverter {
 				System.out.println();
 			}
 
-			System.out.printf("%.4f\n%%", (index + 1.0) / size * 100);
+			if (index + 1 % size / 10 == 0) {
+				System.out.print(".");
+			}
 		}
+		System.out.println("]");
 
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(updatePath))) {
 			oos.writeObject(EMOJI_MAP);
