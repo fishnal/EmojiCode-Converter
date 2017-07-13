@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="EmojiConverter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EmojiConverter_jar</output-path>
+    <root id="archive" name="EmojiConverter.jar">
+      <element id="module-output" name="EmojiConverter" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/jars/jsoup.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
