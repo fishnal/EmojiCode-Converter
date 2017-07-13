@@ -71,7 +71,10 @@ public class EmojiConverter {
 		responseDataCache.deleteOnExit();
 		{
 			System.out.println("retrieving emoji data");
-			InputStream is = new URL(baseURL + "/emoji/").openStream();
+			HttpURLConnection conn = (HttpURLConnection) new URL(baseURL + "/emoji/").openConnection();
+			conn.setRequestMethod("GET");
+			conn.addRequestProperty("User-Agent", "Mozilla/5.0");
+			InputStream is = conn.getInputStream();
 			FileOutputStream fos = new FileOutputStream(responseDataCache);
 			int data;
 			while ((data = is.read()) != -1) {
@@ -86,7 +89,7 @@ public class EmojiConverter {
 		Element emojiList = doc.getElementsByClass("emoji-list").get(0);
 		Elements rows = emojiList.getElementsByTag("tr");
 		int size = rows.size();
-		System.out.print("parsing individual emoji data [");
+		System.out.print("parsing individual emoji data");
 		for (int index = 0; index < size; index++) {
 			try {
 				Element row = rows.get(index);
@@ -103,7 +106,10 @@ public class EmojiConverter {
 
 				try {
 					{
-						InputStream is = new URL(baseURL + emojiURL).openStream();
+						HttpURLConnection conn = (HttpURLConnection) new URL(baseURL + emojiURL).openConnection();
+						conn.setRequestMethod("GET");
+						conn.addRequestProperty("User-Agent", "Mozilla/5.0");
+						InputStream is = conn.getInputStream();
 						FileOutputStream fos = new FileOutputStream(responseDataCache);
 						int d;
 						while ((d = is.read()) != -1) {
@@ -126,18 +132,15 @@ public class EmojiConverter {
 					e.printStackTrace();
 					System.out.println();
 				}
+
+				System.out.println("finished " + baseURL + emojiURL);
 			} catch (Exception e) {
 				System.out.println(index);
 				System.out.println(rows.get(index));
 				e.printStackTrace();
 				System.out.println();
 			}
-
-			if (index + 1 % size / 10 == 0) {
-				System.out.print(".");
-			}
 		}
-		System.out.println("]");
 
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(updatePath))) {
 			oos.writeObject(EMOJI_MAP);
