@@ -1,8 +1,8 @@
 # EmojiCode-Converter
 A tool made to convert plain text into suitable code for the EmojiCode language
 
-".emojie" files can be written in ASCII and then converted into suitable ".emojic" files. Emojis are interpreted through
-short-hand identifiers. For example, ":checkered_flag:" would be converted into 🏁. The converter does not guarantee that the ".emojie" files, when converted into ".emojic" files, are compilable.
+`.emojie` files can be written in ASCII and then converted into suitable `.emojic` files. Emojis are interpreted through
+short-hand identifiers. For example, `: checkered_flag :` (excluding the spaces) would be converted into 🏁. The converter does not guarantee that the `.emojie` files, when converted into `.emojic` files, are compilable.
 
 ## Usage
 ### Java
