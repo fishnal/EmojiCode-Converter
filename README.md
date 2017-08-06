@@ -19,4 +19,4 @@ The modules require in the JavaScript implementation have not yet been exported,
 
 For all languages, either the update or files.emojie argument must be present in order for the program to do something.
 
-Both JavaScript and Java use synchronous requests instead of asynchronous requests in order to maintain the a guaranteed, static flow of the program. This does, however, pose the issue of the program hanging. As such, they should not be used in web applications if applicable.
+Both JavaScript and Java use synchronous requests instead of asynchronous requests in order to maintain a guaranteed, static flow of the program. This does, however, pose the issue of the program hanging. As such, they should not be used in web applications if applicable.
